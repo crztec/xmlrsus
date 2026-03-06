@@ -174,7 +174,6 @@ def main():
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
         # Prevenções extremas contra "Failed to decode response from marionette" no Cloud Run
-        options.add_argument("--remote-debugging-port=9222")
         options.add_argument("-P")
         options.add_argument("default")
         
