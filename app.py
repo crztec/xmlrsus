@@ -172,10 +172,12 @@ def main():
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920,1080")
         
         # O Cloud Run tem permissões restritas em algumas pastas, usar /tmp para o cache do Firefox ajuda a prevenir crashes
         options.set_preference("browser.cache.disk.dir", "/tmp")
         options.set_preference("browser.cache.offline.dir", "/tmp")
+        options.set_preference("dom.ipc.processCount", 1)  # Restringe Firefox a um único processo para poupar memória
         
         servico = Service(GeckoDriverManager().install())
         
