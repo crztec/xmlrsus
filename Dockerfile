@@ -28,5 +28,8 @@ ENV LANG=C.UTF-8
 ENV STREAMLIT_SERVER_PORT=8080
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 
+# Limit upload size to 10MB
+ENV STREAMLIT_SERVER_MAX_UPLOAD_SIZE=10
+
 # Start Streamlit application
-CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.maxUploadSize=10"]
