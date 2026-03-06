@@ -28,3 +28,6 @@ steps:
 
 images:
   - 'gcr.io/$PROJECT_ID/streamlit-xml-robot'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
