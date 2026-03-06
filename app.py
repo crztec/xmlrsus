@@ -173,17 +173,25 @@ def main():
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
+        # Prevenções extremas contra "Failed to decode response from marionette" no Cloud Run
+        options.add_argument("--remote-debugging-port=9222")
+        options.add_argument("-P")
+        options.add_argument("default")
         
         # O Cloud Run tem permissões restritas em algumas pastas, usar /tmp para o cache do Firefox ajuda a prevenir crashes
         options.set_preference("browser.cache.disk.dir", "/tmp")
         options.set_preference("browser.cache.offline.dir", "/tmp")
         options.set_preference("dom.ipc.processCount", 1)  # Restringe Firefox a um único processo para poupar memória
+        options.set_preference("network.http.phishy-userpass-length", 255)
+        options.set_preference("network.proxy.type", 0)
+        options.set_preference("network.dns.disableIPv6", True)
         
-        servico = Service(GeckoDriverManager().install())
+        servico = Service(GeckoDriverManager().install(), log_path=os.devnull)
         
         status_text.text("Iniciando o navegador em segundo plano...")
         navegador = None
-        temp_dir = "temp_xml_uploads"
+        # Mudar a pasta temporária para /tmp, que é o RAM disk rápido no Cloud Run
+        temp_dir = "/tmp/temp_xml_uploads"
         
         try:
             navegador = webdriver.Firefox(service=servico, options=options)
