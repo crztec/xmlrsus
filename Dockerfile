@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     firefox-esr \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
@@ -31,8 +32,8 @@ ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 # Limit upload size to 10MB
 ENV STREAMLIT_SERVER_MAX_UPLOAD_SIZE=10
 
-# Force Mozilla to headless without relying solely on Selenium options
-ENV MOZ_HEADLESS=1
+# Configure Xvfb so Firefox thinks there is a real screen attached
+ENV DISPLAY=:99
 
-# Start Streamlit application
-CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.maxUploadSize=10"]
+# Start Xvfb (Virtual Framebuffer) in background, then start Streamlit application
+CMD Xvfb :99 -screen 0 1920x1080x24 & streamlit run app.py --server.port=8080 --server.address=0.0.0.0 --server.maxUploadSize=10

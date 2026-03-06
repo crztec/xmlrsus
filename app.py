@@ -167,9 +167,11 @@ def main():
 
         # Configurar Selenium Headless
         options = FirefoxOptions()
-        options.add_argument("--headless")
+        # Em vez de --headless puro, usaremos o Xvfb (Virtual Framebuffer) na imagem Docker pra simular tela e evitar bugs de upload
+        # options.add_argument("--headless")
         options.add_argument("--width=1920")
         options.add_argument("--height=1080")
+        options.set_preference("dom.disable_beforeunload", True)
         
         # O Cloud Run tem permissões restritas em algumas pastas, usar /tmp para o cache do Firefox ajuda a prevenir crashes
         options.set_preference("browser.cache.disk.dir", "/tmp")
