@@ -168,10 +168,20 @@ def main():
         # Configurar Selenium Headless
         options = FirefoxOptions()
         options.add_argument("--headless")
+        # Parâmetros vitais para estabilidade do Firefox em contêineres Docker (Cloud Run)
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        
+        # O Cloud Run tem permissões restritas em algumas pastas, usar /tmp para o cache do Firefox ajuda a prevenir crashes
+        options.set_preference("browser.cache.disk.dir", "/tmp")
+        options.set_preference("browser.cache.offline.dir", "/tmp")
+        
         servico = Service(GeckoDriverManager().install())
         
         status_text.text("Iniciando o navegador em segundo plano...")
         navegador = None
+        temp_dir = "temp_xml_uploads"
         
         try:
             navegador = webdriver.Firefox(service=servico, options=options)
@@ -190,7 +200,6 @@ def main():
             
             concluidos = 0
             # Diretório temporário para salvar os XMLs para o Selenium
-            temp_dir = "temp_xml_uploads"
             os.makedirs(temp_dir, exist_ok=True)
             
             for index, linha in df_ordenado.iterrows():
