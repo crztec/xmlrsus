@@ -36,5 +36,5 @@ ENV STREAMLIT_SERVER_MAX_UPLOAD_SIZE=10
 # Configure Xvfb so Chrome thinks there is a real screen attached
 ENV DISPLAY=:99
 
-# Start Xvfb (Virtual Framebuffer) in background, then start Streamlit application
-CMD Xvfb :99 -screen 0 1920x1080x24 & streamlit run app.py --server.port=8080 --server.address=0.0.0.0 --server.maxUploadSize=10
+# Start Streamlit application wrapped inside Xvfb virtual display
+CMD ["xvfb-run", "-s", "-screen 0 1920x1080x24", "streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.maxUploadSize=10"]
