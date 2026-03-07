@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -165,31 +165,36 @@ def main():
         status_text = st.empty()
         log_container = st.container()
 
-        # Configurar Selenium Headless
-        options = FirefoxOptions()
-        # Em vez de --headless puro, usaremos o Xvfb (Virtual Framebuffer) na imagem Docker pra simular tela e evitar bugs de upload
-        # options.add_argument("--headless")
-        options.add_argument("--width=1920")
-        options.add_argument("--height=1080")
-        options.set_preference("dom.disable_beforeunload", True)
+        # Configurar Selenium Chrome Headless
+        options = ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--disable-software-rasterizer")
         
-        # O Cloud Run tem permissões restritas em algumas pastas, usar /tmp para o cache do Firefox ajuda a prevenir crashes
-        options.set_preference("browser.cache.disk.dir", "/tmp")
-        options.set_preference("browser.cache.offline.dir", "/tmp")
-        options.set_preference("dom.ipc.processCount", 1)  # Restringe Firefox a um único processo para poupar memória
-        options.set_preference("network.http.phishy-userpass-length", 255)
-        options.set_preference("network.proxy.type", 0)
-        options.set_preference("network.dns.disableIPv6", True)
+        # Otimizações de rede e cache específicas para Chrome em Docker
+        options.add_argument("--disable-extensions")
+        options.add_argument("--proxy-server='direct://'")
+        options.add_argument("--proxy-bypass-list=*")
+        options.add_argument("--start-maximized")
+        options.add_argument("--disable-background-networking")
+        options.add_argument("--disable-default-apps")
+        options.add_argument("--disable-sync")
+        options.add_argument("--disable-translate")
+        options.add_argument("--metrics-recording-only")
+        options.add_argument("--safebrowsing-disable-auto-update")
         
-        servico = Service(GeckoDriverManager().install(), log_path=os.devnull)
+        servico = Service(ChromeDriverManager().install())
         
-        status_text.text("Iniciando o navegador em segundo plano...")
+        status_text.text("Iniciando o navegador Chromium em segundo plano...")
         navegador = None
         # Mudar a pasta temporária para /tmp, que é o RAM disk rápido no Cloud Run
         temp_dir = "/tmp/temp_xml_uploads"
         
         try:
-            navegador = webdriver.Firefox(service=servico, options=options)
+            navegador = webdriver.Chrome(service=servico, options=options)
             wait = WebDriverWait(navegador, 30)
             
             status_text.text(f"Efetuando login no sistema: {url_sistema} ...")

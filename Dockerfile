@@ -1,12 +1,13 @@
 FROM python:3.9-slim
 
 # Install system dependencies
-# - wget and gnupg are needed to fetch Firefox binaries securely
-# - firefox-esr is the stable Extended Support Release version of Firefox for Linux
+# - wget and gnupg are needed to fetch browser binaries securely
+# - chromium is the open-source base for Google Chrome, fully supported by Google Cloud
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
-    firefox-esr \
+    chromium \
+    chromium-driver \
     xvfb \
     && rm -rf /var/lib/apt/lists/*
 
@@ -32,7 +33,7 @@ ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
 # Limit upload size to 10MB
 ENV STREAMLIT_SERVER_MAX_UPLOAD_SIZE=10
 
-# Configure Xvfb so Firefox thinks there is a real screen attached
+# Configure Xvfb so Chrome thinks there is a real screen attached
 ENV DISPLAY=:99
 
 # Start Xvfb (Virtual Framebuffer) in background, then start Streamlit application
